@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  inventory:
+    build: ./inventory
+    env_file:
+      - ./inventory/.env
+    ports:
+      - "8000:8000"
+
+  payment:
+    build: ./payment
+    env_file:
+      - ./payment/.env
+    ports:
+      - "8001:8000"
+    depends_on:
+      - inventory
+
+  inventory_consumer:
+    build: ./inventory
+    command: python consumer.py
+    env_file:
+      - ./inventory/.env
+
+  payment_consumer:
+    build: ./payment
+    command: python consumer.py
+    env_file:
+      - ./payment/.env
+
+  notification:
+    build: ./notification
+    command: python consumer.py
+    env_file:
+      - ./notification/.env
